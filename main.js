@@ -134,129 +134,109 @@ if (contactBtn) {
 }
 
 // ---- BLOG MODAL ----
-const blogPosts = {
-  1: {
-    tag: 'Mission Update',
-    date: 'March 12, 2025',
-    readTime: '5 min read',
-    image: 'images/teaching-children.jpg',
-    imageAlt: 'Community outreach with children',
-    title: 'New community center opens in partnership with local church',
-    cta: 'Partner With Us',
-    body: `
-      <p>After more than two years of prayer, planning, and partnership, Alta Gracia Missions is thrilled to announce the official opening of a new community center in the heart of one of the most underserved barangays in Cebu. The ribbon-cutting ceremony was attended by over 200 families, local church leaders, and a team of volunteers who helped build and furnish the space from the ground up.</p>
+// ---- BLOG CMS LOAD ----
+let blogPosts = {};
 
-      <h2>A Gathering Place Born from Faith</h2>
-      <p>The center was made possible through a collaboration between Alta Gracia Missions and <strong>Grace Covenant Church</strong>, a local congregation that has been serving its neighborhood for over a decade. Together, both organizations raised funds, coordinated construction crews, and mobilized more than 80 volunteers across six weekends to complete the project.</p>
+async function loadPosts() {
+  const newsGrid = document.getElementById('newsGrid');
+  if (!newsGrid) return;
 
-      <blockquote>"We have been praying for a space like this for years. Now our children have somewhere safe to learn, play, and grow in faith — and our community finally has a home." — Pastor Emmanuel Reyes, Grace Covenant Church</blockquote>
+  try {
+    // We use the GitHub API to list files in the content/blog directory
+    // Repo: Leodekit/alta-gracia-missions
+    const repo = 'Leodekit/alta-gracia-missions';
+    const path = 'content/blog';
+    const response = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`);
+    
+    if (!response.ok) throw new Error('Failed to fetch posts list');
+    
+    const files = await response.json();
+    const jsonFiles = files.filter(file => file.name.endsWith('.json'));
+    
+    newsGrid.innerHTML = ''; // Clear loading
+    
+    if (jsonFiles.length === 0) {
+      newsGrid.innerHTML = '<p>No updates found.</p>';
+      return;
+    }
 
-      <h2>What the Center Offers</h2>
-      <p>The 2,400 square-foot facility is designed to serve as a multipurpose hub for the community, offering:</p>
-      <ul>
-        <li>After-school tutoring and literacy programs for children ages 6–16</li>
-        <li>Weekly feeding programs for families facing food insecurity</li>
-        <li>Vocational skills training for young adults and mothers</li>
-        <li>Sunday worship gatherings and midweek Bible studies</li>
-        <li>Emergency relief distribution during typhoon season</li>
-      </ul>
+    // Fetch and process each post
+    const postPromises = jsonFiles.map(async (file, index) => {
+      const res = await fetch(file.download_url);
+      const data = await res.json();
+      const id = index + 1;
+      blogPosts[id] = data;
+      return { id, ...data };
+    });
 
-      <h2>The Journey Behind the Walls</h2>
-      <p>The road to this opening was not without challenges. Funding shortfalls, permitting delays, and the logistics of coordinating international volunteers tested the resolve of everyone involved. But through generous giving from supporters like you and the tireless work of our local partners, what once seemed impossible became a reality.</p>
+    const posts = await postPromises;
+    
+    // Sort by date descending
+    posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-      <p>This center is more than a building — it is a declaration that these families are seen, valued, and deeply loved. As we look ahead, we are already planning expanded programming and a second phase of construction to add additional classroom space.</p>
+    posts.forEach(post => {
+      const article = document.createElement('article');
+      article.className = 'news-card fade-in visible'; // Mark as visible since it's added after initial observer
+      article.innerHTML = `
+        <div class="news-img">
+          <img src="${post.image}" alt="${post.imageAlt || post.title}" />
+        </div>
+        <div class="news-body">
+          <span class="news-tag">${post.tag}</span>
+          <h3>${post.title}</h3>
+          <p>${post.description || ''}</p>
+          <a href="javascript:void(0)" class="news-link" onclick="openBlogModal(${post.id})">${post.cta || 'Read more'} &rarr;</a>
+        </div>
+      `;
+      newsGrid.appendChild(article);
+    });
 
-      <p><strong>Thank you</strong> to every donor, prayer partner, and volunteer who made this possible. Your generosity is literally changing the landscape of this community — one family at a time.</p>
-    `
-  },
-  2: {
-    tag: 'Events',
-    date: 'April 2, 2025',
-    readTime: '4 min read',
-    image: 'images/agm-hat.jpg',
-    imageAlt: 'Alta Gracia Missions team',
-    title: 'Summer mission trip registration is now open — join us!',
-    cta: 'Register Now',
-    body: `
-      <p>We are excited to announce that registration for our <strong>Summer 2025 Mission Trip</strong> is now officially open! This year, we are returning to the Philippines for two weeks of community outreach, children's ministry, construction work, and worship — and we want you to be part of it.</p>
-
-      <h2>Trip Details at a Glance</h2>
-      <ul>
-        <li><strong>Dates:</strong> July 14 – July 28, 2025</li>
-        <li><strong>Location:</strong> Cebu City & surrounding barangays, Philippines</li>
-        <li><strong>Team size:</strong> Limited to 24 participants</li>
-        <li><strong>Cost:</strong> $2,800 per person (includes flights, housing, and meals)</li>
-        <li><strong>Application deadline:</strong> May 30, 2025</li>
-      </ul>
-
-      <h2>What to Expect</h2>
-      <p>This is not a tourist trip — it is a transformative experience designed to stretch your faith and deepen your compassion for people living in poverty. Participants will spend their days working alongside local church partners, running programs for children, assisting with construction at our new community center, and sharing meals with families in the community.</p>
-
-      <blockquote>"I came back from last summer's trip a completely different person. I thought I was going to serve, but I was the one who was truly served. The faith of the people there will stay with me forever." — Sarah M., 2024 team member</blockquote>
-
-      <h2>Who Can Apply?</h2>
-      <p>We welcome adults (18+) and students (16–17 with parental consent) who have a heart for service and a willingness to step outside their comfort zone. No special skills are required — just a servant's heart and a spirit of adventure. Prior mission trip experience is helpful but not necessary.</p>
-
-      <h2>How to Register</h2>
-      <p>Click the button below to fill out our interest form. Our team will follow up within 5 business days to walk you through the application process, fundraising support, and pre-trip training schedule.</p>
-
-      <p>Spots fill up fast — last year's trip reached capacity in under three weeks. Don't wait. Your seat at the table — and your place in this story — is waiting for you.</p>
-    `
-  },
-  3: {
-    tag: 'Impact Report',
-    date: 'January 20, 2025',
-    readTime: '6 min read',
-    image: 'images/worship-color.jpg',
-    imageAlt: 'Worship gathering',
-    title: 'Annual report: 500 families supported across 3 nations in 2024',
-    cta: 'Support Our Mission',
-    body: `
-      <p>2024 was a defining year for Alta Gracia Missions. What began as a small ministry with a big dream has grown into a movement of compassion spanning three nations and touching the lives of over <strong>500 families</strong>. This report is a celebration of what God has done through the generosity of our partners, the dedication of our team, and the resilience of the communities we serve.</p>
-
-      <h2>By the Numbers</h2>
-      <ul>
-        <li><strong>500+</strong> families directly served through feeding, medical, and education programs</li>
-        <li><strong>1,200+</strong> children reached through youth and children's ministry</li>
-        <li><strong>3 nations:</strong> Philippines, Honduras, and Guatemala</li>
-        <li><strong>12</strong> local church partnerships established or strengthened</li>
-        <li><strong>80+</strong> short-term volunteers deployed</li>
-        <li><strong>$248,000</strong> raised and deployed for community programs</li>
-      </ul>
-
-      <h2>Highlights from the Field</h2>
-      <p>In the Philippines, our longest-running program continued to expand. We launched a new literacy initiative that now serves 340 children in weekly tutoring sessions, and our feeding program provided over 18,000 meals in 2024 alone. The opening of our community center in Cebu marked a historic milestone for the organization.</p>
-
-      <blockquote>"The numbers are meaningful, but behind every number is a name — a child who learned to read, a mother who found work, a family who sat down to a hot meal and knew they were not forgotten." — Leomie Sarabia, Executive Director</blockquote>
-
-      <p>In Honduras, we partnered with a local ministry to support 80 families in a mountainous region with limited access to clean water and medical care. Alongside our partners, we organized two medical outreaches and helped fund a water filtration system that now serves an entire village.</p>
-
-      <h2>Looking Ahead to 2025</h2>
-      <p>Our goals for 2025 are ambitious but grounded in faith. We are committed to deepening our work in existing communities rather than spreading thin across new ones. Key priorities include:</p>
-      <ul>
-        <li>Completing Phase 2 of the Cebu community center</li>
-        <li>Launching a micro-enterprise program for mothers in the Philippines</li>
-        <li>Growing our volunteer team to 120+ annually</li>
-        <li>Expanding our medical outreach program in Honduras</li>
-      </ul>
-
-      <p>None of this is possible without you. Every dollar you give, every prayer you pray, every trip you take — it compounds into something far greater than any of us could accomplish alone. <strong>Thank you for being part of this story.</strong></p>
-    `
+  } catch (err) {
+    console.error('Error loading posts:', err);
+    newsGrid.innerHTML = '<p>Error loading updates. Please try again later.</p>';
   }
-};
+}
+
+// Simple Markdown to HTML helper
+function parseMarkdown(md) {
+  if (!md) return '';
+  return md
+    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
+    .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+    .replace(/\*(.*)\*/gim, '<em>$1</em>')
+    .replace(/!\[(.*?)\]\((.*?)\)/gim, "<img alt='$1' src='$2' />")
+    .replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>")
+    .replace(/\n$/gim, '<br />')
+    .split('\n').map(line => {
+      if (!line.trim()) return '';
+      if (line.startsWith('<')) return line; // Already HTML
+      return `<p>${line}</p>`;
+    }).join('');
+}
 
 function openBlogModal(id) {
   const post = blogPosts[id];
   if (!post) return;
 
   document.getElementById('blogModalImg').src = post.image;
-  document.getElementById('blogModalImg').alt = post.imageAlt;
+  document.getElementById('blogModalImg').alt = post.imageAlt || post.title;
   document.getElementById('blogModalTag').textContent = post.tag;
-  document.getElementById('blogModalDate').textContent = post.date;
+  
+  // Format date
+  const date = new Date(post.date);
+  document.getElementById('blogModalDate').textContent = date.toLocaleDateString('en-US', { 
+    month: 'long', day: 'numeric', year: 'numeric' 
+  });
+  
   document.getElementById('blogModalReadTime').textContent = post.readTime;
   document.getElementById('blogModalTitle').textContent = post.title;
-  document.getElementById('blogModalBody').innerHTML = post.body;
-  document.getElementById('blogModalCta').textContent = post.cta;
+  
+  // Parse body if it looks like markdown, otherwise use as is
+  document.getElementById('blogModalBody').innerHTML = parseMarkdown(post.body);
+  document.getElementById('blogModalCta').textContent = post.cta || 'Connect with us';
 
   const modal = document.getElementById('blogModal');
   modal.classList.add('is-open');
@@ -271,12 +251,8 @@ function closeBlogModal() {
   document.body.style.overflow = '';
 }
 
-// Open on "Read more" click
-document.querySelectorAll('[data-blog-id]').forEach(link => {
-  link.addEventListener('click', () => {
-    openBlogModal(link.dataset.blogId);
-  });
-});
+// Initial load
+document.addEventListener('DOMContentLoaded', loadPosts);
 
 // Close on overlay click
 document.getElementById('blogModalOverlay').addEventListener('click', closeBlogModal);
