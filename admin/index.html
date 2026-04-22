@@ -1,64 +1,75 @@
-<script>
-window.addEventListener("load", function () {
-  if (!window.CMS) {
-    console.error("CMS not loaded");
-    return;
-  }
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Manager | Alta Gracia Missions</title>
+</head>
+<body>
+  <script>
+    // Prevent the CMS from automatically initializing
+    window.CMS_MANUAL_INIT = true;
+  </script>
 
-  CMS.init({
-    config: {
-      backend: {
-        name: "github",
-        repo: "Leodekit/alta-gracia-missions",
-        branch: "main",
-        base_url: "https://decap-oauth-server.onrender.com"
-      },
+  <!-- Decap CMS library -->
+  <script src="https://unpkg.com/decap-cms@^3.3.0/dist/decap-cms.js"></script>
 
-      local_backend: false,
-
-      media_folder: "images/uploads",
-      public_folder: "/images/uploads",
-
-      collections: [
-        {
-          name: "blogPosts",
-          label: "Blog Posts",
-          folder: "content/blog",
-          create: true,
-          slug: "{{year}}-{{month}}-{{day}}-{{slug}}",
-          extension: "json",
-          format: "json",
-          fields: [
-            { label: "Title", name: "title", widget: "string" },
-            { label: "Publish Date", name: "date", widget: "datetime" },
-            { label: "Tag", name: "tag", widget: "select", options: ["Mission Update", "Events", "Impact Report", "Story"] },
-            { label: "Featured Image", name: "image", widget: "image" },
-            { label: "Image Alt Text", name: "imageAlt", widget: "string" },
-            { label: "Read Time", name: "readTime", widget: "string" },
-            { label: "CTA Text", name: "cta", widget: "string", default: "Read more" },
-            { label: "Short Description", name: "description", widget: "text" },
-            { label: "Body", name: "body", widget: "markdown" }
-          ]
+  <script>
+    CMS.init({
+      config: {
+        backend: {
+          name: "github",
+          repo: "Leodekit/alta-gracia-missions",
+          branch: "main",
+          base_url: "https://decap-oauth-server.onrender.com"
         },
-        {
-          name: "eventPosts",
-          label: "Events",
-          folder: "content/events",
-          create: true,
-          slug: "{{year}}-{{month}}-{{day}}-{{slug}}",
-          extension: "json",
-          format: "json",
-          fields: [
-            { label: "Event Name", name: "title", widget: "string" },
-            { label: "Event Date", name: "eventDate", widget: "datetime" },
-            { label: "Location", name: "location", widget: "string" },
-            { label: "Image", name: "image", widget: "image" },
-            { label: "Description", name: "description", widget: "markdown" },
-            { label: "Registration Link", name: "link", widget: "string", required: false }
-          ]
-        }
-      ]
-    }
-  });
-});
-</script>
+
+        local_backend: false,
+
+        media_folder: "images/uploads",
+        public_folder: "/images/uploads",
+
+        collections: [
+          {
+            name: "blogPosts",
+            label: "Blog Posts",
+            folder: "content/blog",
+            create: true,
+            slug: "{{year}}-{{month}}-{{day}}-{{slug}}",
+            extension: "json",
+            format: "json",
+            fields: [
+              { label: "Title", name: "title", widget: "string" },
+              { label: "Publish Date", name: "date", widget: "datetime" },
+              { label: "Tag", name: "tag", widget: "select", options: ["Mission Update", "Events", "Impact Report", "Story"] },
+              { label: "Featured Image", name: "image", widget: "image" },
+              { label: "Image Alt Text", name: "imageAlt", widget: "string" },
+              { label: "Read Time", name: "readTime", widget: "string" },
+              { label: "CTA Text", name: "cta", widget: "string", default: "Read more" },
+              { label: "Short Description", name: "description", widget: "text" },
+              { label: "Body", name: "body", widget: "markdown" }
+            ]
+          },
+          {
+            name: "eventPosts",
+            label: "Events",
+            folder: "content/events",
+            create: true,
+            slug: "{{year}}-{{month}}-{{day}}-{{slug}}",
+            extension: "json",
+            format: "json",
+            fields: [
+              { label: "Event Name", name: "title", widget: "string" },
+              { label: "Event Date", name: "eventDate", widget: "datetime" },
+              { label: "Location", name: "location", widget: "string" },
+              { label: "Image", name: "image", widget: "image" },
+              { label: "Description", name: "description", widget: "markdown" },
+              { label: "Registration Link", name: "link", widget: "string", required: false }
+            ]
+          }
+        ]
+      }
+    });
+  </script>
+</body>
+</html>
