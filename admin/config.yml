@@ -1,14 +1,5 @@
-backend:
-  name: github
-  repo: Leodekit/alta-gracia-missions
-  branch: main # or master, depending on your default branch
-  auth_endpoint: https://decap-oauth-server.onrender.com/auth
-
-media_folder: "images/uploads" # Where images will be saved
-public_folder: "/images/uploads" # Where they are served from
-
 collections:
-  - name: "blog"
+  - name: "blogPosts"
     label: "Blog Posts"
     folder: "content/blog"
     create: true
@@ -21,12 +12,12 @@ collections:
       - { label: "Tag", name: "tag", widget: "select", options: ["Mission Update", "Events", "Impact Report", "Story"] }
       - { label: "Featured Image", name: "image", widget: "image" }
       - { label: "Image Alt Text", name: "imageAlt", widget: "string" }
-      - { label: "Read Time (e.g. 5 min read)", name: "readTime", widget: "string" }
+      - { label: "Read Time", name: "readTime", widget: "string" }
       - { label: "CTA Text", name: "cta", widget: "string", default: "Read more" }
       - { label: "Short Description", name: "description", widget: "text" }
       - { label: "Body", name: "body", widget: "markdown" }
 
-  - name: "events"
+  - name: "eventPosts"
     label: "Events"
     folder: "content/events"
     create: true
