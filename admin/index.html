@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Content Manager</title>
+
   <base href="/admin/" />
 
   <script>
@@ -12,12 +13,17 @@
 </head>
 <body>
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script src="https://unpkg.com/js-yaml@4/dist/js-yaml.min.js"></script>
 
   <script>
     fetch('/admin/config.yml')
-      .then(response => response.text())
-      .then(config => {
-        CMS.init({ config });
+      .then(res => res.text())
+      .then(text => {
+        const config = jsyaml.load(text); // ✅ convert YAML → JS object
+
+        CMS.init({
+          config: config
+        });
       });
   </script>
 </body>
