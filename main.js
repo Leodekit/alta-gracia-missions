@@ -169,7 +169,7 @@ async function loadPosts() {
       return { id, ...data };
     });
 
-    const posts = await postPromises;
+    const posts = await Promise.all(postPromises);
     
     // Sort by date descending
     posts.sort((a, b) => new Date(b.date) - new Date(a.date));
