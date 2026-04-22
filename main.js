@@ -251,8 +251,76 @@ function closeBlogModal() {
   document.body.style.overflow = '';
 }
 
+async function loadEvents() {
+  const eventsGrid = document.getElementById('eventsGrid');
+  if (!eventsGrid) return;
+
+  try {
+    const repo = 'Leodekit/alta-gracia-missions';
+    const path = 'content/events';
+    const response = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`);
+    
+    if (!response.ok) throw new Error('Failed to fetch events list');
+    
+    const files = await response.json();
+    const jsonFiles = files.filter(file => file.name.endsWith('.json'));
+    
+    eventsGrid.innerHTML = '';
+    
+    if (jsonFiles.length === 0) {
+      eventsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-light); padding: 40px;">No upcoming events at this time. Check back soon!</p>';
+      return;
+    }
+
+    const eventPromises = jsonFiles.map(async (file) => {
+      const res = await fetch(file.download_url);
+      return await res.json();
+    });
+
+    const events = await Promise.all(eventPromises);
+    
+    // Sort by date ascending (soonest first)
+    events.sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
+
+    events.forEach(event => {
+      const date = new Date(event.eventDate);
+      const day = date.getDate();
+      const month = date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+      
+      const card = document.createElement('div');
+      card.className = 'event-card fade-in visible';
+      card.innerHTML = `
+        <div class="event-date-badge">
+          <span class="event-month">${month}</span>
+          <span class="event-day">${day}</span>
+        </div>
+        <div class="event-img">
+          <img src="${event.image}" alt="${event.title}" />
+        </div>
+        <div class="event-info">
+          <h3>${event.title}</h3>
+          <div class="event-meta">
+            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${event.location}</span>
+            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
+          </div>
+          <p>${event.description.length > 120 ? event.description.substring(0, 120) + '...' : event.description}</p>
+          <a href="#contact" class="btn-link">Register Now &rarr;</a>
+        </div>
+      `;
+      eventsGrid.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error('Error loading events:', err);
+    eventsGrid.innerHTML = '<p>No upcoming events found.</p>';
+  }
+}
+
 // Initial load
-document.addEventListener('DOMContentLoaded', loadPosts);
+document.addEventListener('DOMContentLoaded', () => {
+  loadPosts();
+  loadEvents();
+});
 
 // Close on overlay click
 document.getElementById('blogModalOverlay').addEventListener('click', closeBlogModal);
