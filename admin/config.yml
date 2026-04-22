@@ -2,6 +2,7 @@ backend:
   name: github
   repo: Leodekit/alta-gracia-missions
   branch: main # or master, depending on your default branch
+  auth_endpoint: https://decap-oauth-server.onrender.com/auth
 
 media_folder: "images/uploads" # Where images will be saved
 public_folder: "/images/uploads" # Where they are served from
